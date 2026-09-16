@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 
 
 def create_app():
@@ -10,6 +10,15 @@ def create_app():
     @app.get("/")
     def home():
         return render_template("index.html")
+
+    @app.get("/about")
+    def about():
+        return render_template("about.html")
+
+    @app.route("/contact", methods=["GET", "POST"])
+    def contact():
+        submitted = request.method == "POST"
+        return render_template("contact.html", submitted=submitted)
 
     @app.get("/health")
     def health():

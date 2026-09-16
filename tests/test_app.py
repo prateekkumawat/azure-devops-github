@@ -17,3 +17,22 @@ def test_health_endpoint_returns_ok():
 
     assert response.status_code == 200
     assert response.get_json() == {"status": "ok"}
+
+
+def test_about_and_contact_pages_load():
+    client = create_app().test_client()
+
+    assert client.get("/about").status_code == 200
+    assert client.get("/contact").status_code == 200
+
+
+def test_contact_form_confirms_submission():
+    client = create_app().test_client()
+
+    response = client.post(
+        "/contact",
+        data={"name": "Ada", "email": "ada@example.com", "message": "Hello"},
+    )
+
+    assert response.status_code == 200
+    assert b"Your message was received" in response.data

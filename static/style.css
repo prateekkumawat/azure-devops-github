@@ -19,6 +19,40 @@ body {
   font-family: Georgia, "Times New Roman", serif;
 }
 
+.shell-wide {
+  width: min(1040px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand,
+.nav-links a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.brand {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+  font: 700 0.8rem/1 Arial, sans-serif;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+}
+
 .shell {
   width: min(680px, calc(100% - 40px));
   margin: 0 auto;
@@ -47,6 +81,58 @@ h1 {
   color: var(--muted);
   font-size: 1.2rem;
   line-height: 1.5;
+}
+
+.content-block {
+  max-width: 520px;
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.content-block h2 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 1.6rem;
+  font-weight: 400;
+}
+
+.contact-form {
+  display: grid;
+  max-width: 520px;
+  gap: 9px;
+  font: 700 0.8rem/1.2 Arial, sans-serif;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.5);
+  font: 1rem/1.4 Georgia, "Times New Roman", serif;
+}
+
+.contact-form textarea {
+  resize: vertical;
+}
+
+.contact-form .button {
+  justify-self: start;
+}
+
+.notice {
+  max-width: 480px;
+  margin: 28px 0;
+  padding: 18px;
+  border-left: 4px solid #4f9d69;
+  background: rgba(79, 157, 105, 0.12);
+  font-size: 1.1rem;
 }
 
 .actions {
@@ -87,6 +173,15 @@ h1 {
 }
 
 @media (max-width: 540px) {
+  .nav {
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .nav-links {
+    gap: 12px;
+  }
+
   .shell {
     padding-top: 12vh;
   }

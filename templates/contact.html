@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Contact | Flask Basics{% endblock %}
+
+{% block content %}
+<p class="eyebrow">Get in touch</p>
+<h1>Contact us.</h1>
+{% if submitted %}
+  <p class="notice">Thanks for reaching out. Your message was received.</p>
+  <a class="button primary" href="{{ url_for('contact') }}">Send another message</a>
+{% else %}
+  <p class="intro">This example form shows how Flask handles a POST request.</p>
+  <form class="contact-form" method="post">
+    <label for="name">Name</label>
+    <input id="name" name="name" type="text" autocomplete="name" required>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="email" required>
+    <label for="message">Message</label>
+    <textarea id="message" name="message" rows="5" required></textarea>
+    <button class="button primary" type="submit">Send message</button>
+  </form>
+{% endif %}
+{% endblock %}
