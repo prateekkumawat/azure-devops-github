@@ -36,3 +36,9 @@ def test_contact_form_confirms_submission():
 
     assert response.status_code == 200
     assert b"Your message was received" in response.data
+
+
+def test_database_url_is_configured():
+    app = create_app()
+
+    assert app.config["DATABASE_URL"].startswith("mysql+pymysql://")
