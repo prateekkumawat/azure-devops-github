@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flask Basics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main class="shell">
+      <p class="eyebrow">Python web starter</p>
+      <h1>Your Flask app is running.</h1>
+      <p class="intro">A small foundation for routes, templates, static files, and tests.</p>
+      <div class="actions">
+        <a class="button primary" href="/health">Check health</a>
+        <a class="button" href="https://flask.palletsprojects.com/" target="_blank" rel="noreferrer">Read Flask docs</a>
+      </div>
+      <p class="status"><span></span> Server ready on port 5000</p>
+    </main>
+  </body>
+</html>
