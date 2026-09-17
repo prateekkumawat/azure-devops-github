@@ -28,4 +28,4 @@ jobs:
       - name: Install Requirements
         working-directory: /app
         run: | 
-          sudo pip3.12 install -r requirements.txt 
+          sudo pip3.12 install -r requirements.txt --break-system-packages
