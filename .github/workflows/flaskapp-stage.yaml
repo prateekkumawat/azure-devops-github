@@ -22,7 +22,7 @@ jobs:
 
       - name: Copy Code in /app dir
         run: |
-          sudo mkdir /app
+          sudo mkdir -p /app
           sudo cp -rvf $GITHUB_WORKSPACE/. /app
 
       - name: Install Requirements
