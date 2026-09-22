@@ -29,3 +29,7 @@ jobs:
         working-directory: /app
         run: | 
           sudo pip3.12 install -r requirements.txt --break-system-packages
+
+      - name: start flaskapp 
+        run: | 
+          sudo systemctl restart flask-app.service    
