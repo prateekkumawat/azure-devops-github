@@ -10,7 +10,7 @@ def create_app():
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
     app.config["DATABASE_URL"] = os.environ.get(
         "DATABASE_URL",
-        "mysql+pymysql://root:Redhat@123456@127.0.0.1:3306/flask_app",
+        "mysql+pymysql://root:NewStrongPassword123@127.0.0.1:3306/flask_app",
     )
     database_engine = create_engine(
         app.config["DATABASE_URL"],
