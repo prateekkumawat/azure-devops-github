@@ -10,7 +10,7 @@ def create_app():
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
     app.config["DATABASE_URL"] = os.environ.get(
         "DATABASE_URL",
-        "mysql+pymysql://root:password@127.0.0.1:3306/flask_app",
+        "mysql+pymysql://root:Redhat@123456@127.0.0.1:3306/flask_app",
     )
     database_engine = create_engine(
         app.config["DATABASE_URL"],
@@ -53,7 +53,7 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(
-        host=os.environ.get("FLASK_HOST", "127.0.0.1"),
+        host=os.environ.get("FLASK_HOST", "0.0.0.0"),
         port=int(os.environ.get("FLASK_PORT", "5000")),
         debug=os.environ.get("FLASK_DEBUG", "1") == "1",
     )
