@@ -1,6 +1,6 @@
-# Flask Basics
+# Flask Contact API
 
-A minimal Flask app with a server-rendered page, static CSS, a health endpoint, and tests.
+A production-oriented Flask app with a server-rendered contact form, SQL-backed message storage, JSON API, health endpoints, and tests.
 
 ## Run locally
 
@@ -33,3 +33,15 @@ pytest
 ## Configuration
 
 The app accepts `FLASK_HOST`, `FLASK_PORT`, `FLASK_DEBUG`, `SECRET_KEY`, and `DATABASE_URL` environment variables.
+
+## API
+
+Create a message:
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/messages `
+	-ContentType "application/json" `
+	-Body '{"name":"Ada Lovelace","email":"ada@example.com","message":"Hello"}'
+```
+
+List messages with `GET /api/messages`. Set `API_KEY` in production and send it as the `X-API-Key` header for this administrative endpoint. The schema is created lazily on the first database-backed request; use a migration tool such as Alembic for controlled production schema changes.
