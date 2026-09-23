@@ -10,8 +10,8 @@ name: Release Code on Flask app prod
 
 on:
   push:
-    tags:
-      - v1.1.2
+    branches:
+      - main
 
 jobs:
   release-build:
