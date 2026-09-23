@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Release Code on Flask app stage
+name: Release Code on Flask app prod
 
 on:
   push:
