@@ -1,3 +1,6 @@
+from sqlalchemy.engine import Engine
+from sqlalchemy.exc import SQLAlchemyError
+
 from app import create_app
 
 
@@ -36,3 +39,22 @@ def test_contact_form_confirms_submission():
 
     assert response.status_code == 200
     assert b"Your message was received" in response.data
+
+
+def test_database_url_is_configured():
+    app = create_app()
+
+    assert app.config["DATABASE_URL"].startswith("mysql+pymysql://")
+
+
+def test_database_health_reports_unavailable_on_connection_error(monkeypatch):
+    def fail_connect(_engine):
+        raise SQLAlchemyError("database unavailable")
+
+    monkeypatch.setattr(Engine, "connect", fail_connect)
+    client = create_app().test_client()
+
+    response = client.get("/db-health")
+
+    assert response.status_code == 503
+    assert response.get_json() == {"status": "unavailable", "database": "mysql"}

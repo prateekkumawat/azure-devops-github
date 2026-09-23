@@ -10,13 +10,19 @@
   <a class="button primary" href="{{ url_for('contact') }}">Send another message</a>
 {% else %}
   <p class="intro">This example form shows how Flask handles a POST request.</p>
+  {% if errors %}
+    <p class="notice error">{{ errors.get('database', 'Please check the highlighted fields.') }}</p>
+  {% endif %}
   <form class="contact-form" method="post">
     <label for="name">Name</label>
-    <input id="name" name="name" type="text" autocomplete="name" required>
+    <input id="name" name="name" type="text" autocomplete="name" value="{{ values.get('name', '') if values else '' }}" required>
+    {% if errors and errors.get('name') %}<span class="field-error">{{ errors['name'] }}</span>{% endif %}
     <label for="email">Email</label>
-    <input id="email" name="email" type="email" autocomplete="email" required>
+    <input id="email" name="email" type="email" autocomplete="email" value="{{ values.get('email', '') if values else '' }}" required>
+    {% if errors and errors.get('email') %}<span class="field-error">{{ errors['email'] }}</span>{% endif %}
     <label for="message">Message</label>
-    <textarea id="message" name="message" rows="5" required></textarea>
+    <textarea id="message" name="message" rows="5" required>{{ values.get('message', '') if values else '' }}</textarea>
+    {% if errors and errors.get('message') %}<span class="field-error">{{ errors['message'] }}</span>{% endif %}
     <button class="button primary" type="submit">Send message</button>
   </form>
 {% endif %}

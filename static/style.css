@@ -190,3 +190,18 @@ h1 {
     font-size: 3.6rem;
   }
 }
+
+.notice.error,
+.field-error {
+  color: #a33a2b;
+}
+
+.notice.error {
+  border-left-color: #a33a2b;
+  background: rgba(163, 58, 43, 0.1);
+}
+
+.field-error {
+  margin-top: -5px;
+  font: 0.8rem/1.2 Arial, sans-serif;
+}
