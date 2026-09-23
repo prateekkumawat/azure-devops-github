@@ -11,7 +11,7 @@ name: Release Code on Flask app prod
 on:
   push:
     tags:
-      - v1.1.1
+      - v1.1.2
 
 jobs:
   release-build:
