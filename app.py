@@ -26,7 +26,7 @@ def create_app():
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
     app.config["DATABASE_URL"] = os.environ.get(
         "DATABASE_URL",
-        f"sqlite:///{os.path.join(os.path.dirname(__file__), 'inventory.db')}",
+        "mysql+pymysql://root:NewStrongPassword123@127.0.0.1:3306/flask_app",
     )
     database_engine = create_engine(
         app.config["DATABASE_URL"],
@@ -287,9 +287,9 @@ def create_app():
             with database_engine.connect() as connection:
                 connection.execute(text("SELECT 1"))
         except SQLAlchemyError:
-            return jsonify(status="unavailable", database="sqlite"), 503
+            return jsonify(status="unavailable", database="mysql"), 503
 
-        return jsonify(status="ok", database="sqlite")
+        return jsonify(status="ok", database="mysql")
 
     @app.get("/health")
     def health():
