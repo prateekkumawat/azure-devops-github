@@ -43,7 +43,7 @@ def create_app():
         Column("message", Text, nullable=False),
         Column("created_at", DateTime(timezone=True), nullable=False),
     )
-    categories = Table(
+    inventory_categories = Table(
         "categories",
         metadata,
         Column("id", Integer, primary_key=True),
@@ -52,7 +52,7 @@ def create_app():
         Column("description", Text, nullable=True),
         Column("created_at", DateTime(timezone=True), nullable=False),
     )
-    products = Table(
+    inventory_products = Table(
         "products",
         metadata,
         Column("id", Integer, primary_key=True),
@@ -68,7 +68,9 @@ def create_app():
     def initialise_database():
         metadata.create_all(database_engine)
         with database_engine.begin() as connection:
-            category_count = connection.execute(select(func.count()).select_from(categories)).scalar_one()
+            category_count = connection.execute(
+                select(func.count()).select_from(inventory_categories)
+            ).scalar_one()
             if category_count == 0:
                 category_rows = [
                     {
@@ -90,13 +92,17 @@ def create_app():
                         "created_at": datetime.now(timezone.utc),
                     },
                 ]
-                connection.execute(insert(categories), category_rows)
+                connection.execute(insert(inventory_categories), category_rows)
 
-            product_count = connection.execute(select(func.count()).select_from(products)).scalar_one()
+            product_count = connection.execute(
+                select(func.count()).select_from(inventory_products)
+            ).scalar_one()
             if product_count == 0:
                 category_lookup = {
                     row["slug"]: row["id"]
-                    for row in connection.execute(select(categories.c.slug, categories.c.id)).mappings().all()
+                    for row in connection.execute(
+                        select(inventory_categories.c.slug, inventory_categories.c.id)
+                    ).mappings().all()
                 }
                 product_rows = [
                     {
@@ -136,7 +142,7 @@ def create_app():
                         "created_at": datetime.now(timezone.utc),
                     },
                 ]
-                connection.execute(insert(products), product_rows)
+                connection.execute(insert(inventory_products), product_rows)
 
     def message_payload(data):
         values = {
@@ -165,11 +171,17 @@ def create_app():
         try:
             initialise_database()
             with database_engine.connect() as connection:
-                total_products = connection.execute(select(func.count()).select_from(products)).scalar_one()
-                low_stock = connection.execute(
-                    select(func.count()).select_from(products).where(products.c.stock_quantity <= 10)
+                total_products = connection.execute(
+                    select(func.count()).select_from(inventory_products)
                 ).scalar_one()
-                categories_count = connection.execute(select(func.count()).select_from(categories)).scalar_one()
+                low_stock = connection.execute(
+                    select(func.count()).select_from(inventory_products).where(
+                        inventory_products.c.stock_quantity <= 10
+                    )
+                ).scalar_one()
+                categories_count = connection.execute(
+                    select(func.count()).select_from(inventory_categories)
+                ).scalar_one()
         except SQLAlchemyError:
             total_products = 0
             low_stock = 0
@@ -191,7 +203,7 @@ def create_app():
             initialise_database()
             with database_engine.connect() as connection:
                 rows = connection.execute(
-                    select(categories).order_by(categories.c.name.asc())
+                    select(inventory_categories).order_by(inventory_categories.c.name.asc())
                 ).mappings().all()
         except SQLAlchemyError:
             rows = []
@@ -204,16 +216,21 @@ def create_app():
             with database_engine.connect() as connection:
                 rows = connection.execute(
                     select(
-                        products.c.id,
-                        products.c.name,
-                        products.c.sku,
-                        products.c.price,
-                        products.c.stock_quantity,
-                        products.c.status,
-                        categories.c.name.label("category_name"),
+                        inventory_products.c.id,
+                        inventory_products.c.name,
+                        inventory_products.c.sku,
+                        inventory_products.c.price,
+                        inventory_products.c.stock_quantity,
+                        inventory_products.c.status,
+                        inventory_categories.c.name.label("category_name"),
                     )
-                    .select_from(products.join(categories, products.c.category_id == categories.c.id))
-                    .order_by(products.c.name.asc())
+                    .select_from(
+                        inventory_products.join(
+                            inventory_categories,
+                            inventory_products.c.category_id == inventory_categories.c.id,
+                        )
+                    )
+                    .order_by(inventory_products.c.name.asc())
                 ).mappings().all()
         except SQLAlchemyError:
             rows = []
