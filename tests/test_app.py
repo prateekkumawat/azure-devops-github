@@ -10,7 +10,8 @@ def test_home_page_loads():
     response = client.get("/")
 
     assert response.status_code == 200
-    assert b"Your Flask app is running" in response.data
+    assert b"Inventory dashboard" in response.data
+    assert b"Low stock alerts" in response.data
 
 
 def test_health_endpoint_returns_ok():
