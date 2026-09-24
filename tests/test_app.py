@@ -14,6 +14,18 @@ def test_home_page_loads():
     assert b"Low stock alerts" in response.data
 
 
+def test_inventory_and_category_pages_load():
+    client = create_app().test_client()
+
+    inventory_response = client.get("/inventory")
+    categories_response = client.get("/categories")
+
+    assert inventory_response.status_code == 200
+    assert categories_response.status_code == 200
+    assert b"Wireless Mouse" in inventory_response.data
+    assert b"Electronics" in categories_response.data
+
+
 def test_health_endpoint_returns_ok():
     client = create_app().test_client()
 

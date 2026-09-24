@@ -2,7 +2,22 @@ import os
 from datetime import datetime, timezone
 
 from flask import Flask, jsonify, render_template, request
-from sqlalchemy import Column, DateTime, Integer, MetaData, String, Table, Text, create_engine, insert, select, text
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    MetaData,
+    String,
+    Table,
+    Text,
+    create_engine,
+    func,
+    insert,
+    select,
+    text,
+)
 from sqlalchemy.exc import SQLAlchemyError
 
 
@@ -11,7 +26,7 @@ def create_app():
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
     app.config["DATABASE_URL"] = os.environ.get(
         "DATABASE_URL",
-        "mysql+pymysql://root:NewStrongPassword123@127.0.0.1:3306/flask_app",
+        f"sqlite:///{os.path.join(os.path.dirname(__file__), 'inventory.db')}",
     )
     database_engine = create_engine(
         app.config["DATABASE_URL"],
@@ -28,9 +43,100 @@ def create_app():
         Column("message", Text, nullable=False),
         Column("created_at", DateTime(timezone=True), nullable=False),
     )
+    categories = Table(
+        "categories",
+        metadata,
+        Column("id", Integer, primary_key=True),
+        Column("name", String(120), nullable=False),
+        Column("slug", String(120), nullable=False, unique=True),
+        Column("description", Text, nullable=True),
+        Column("created_at", DateTime(timezone=True), nullable=False),
+    )
+    products = Table(
+        "products",
+        metadata,
+        Column("id", Integer, primary_key=True),
+        Column("name", String(180), nullable=False),
+        Column("sku", String(120), nullable=False, unique=True),
+        Column("category_id", Integer, ForeignKey("categories.id"), nullable=False),
+        Column("price", Float, nullable=False),
+        Column("stock_quantity", Integer, nullable=False),
+        Column("status", String(30), nullable=False, default="in_stock"),
+        Column("created_at", DateTime(timezone=True), nullable=False),
+    )
 
     def initialise_database():
         metadata.create_all(database_engine)
+        with database_engine.begin() as connection:
+            category_count = connection.execute(select(func.count()).select_from(categories)).scalar_one()
+            if category_count == 0:
+                category_rows = [
+                    {
+                        "name": "Electronics",
+                        "slug": "electronics",
+                        "description": "Gadgets, accessories, and digital tools.",
+                        "created_at": datetime.now(timezone.utc),
+                    },
+                    {
+                        "name": "Office Supplies",
+                        "slug": "office-supplies",
+                        "description": "Daily essentials for desks and teams.",
+                        "created_at": datetime.now(timezone.utc),
+                    },
+                    {
+                        "name": "Furniture",
+                        "slug": "furniture",
+                        "description": "Workspaces and comfort-focused essentials.",
+                        "created_at": datetime.now(timezone.utc),
+                    },
+                ]
+                connection.execute(insert(categories), category_rows)
+
+            product_count = connection.execute(select(func.count()).select_from(products)).scalar_one()
+            if product_count == 0:
+                category_lookup = {
+                    row["slug"]: row["id"]
+                    for row in connection.execute(select(categories.c.slug, categories.c.id)).mappings().all()
+                }
+                product_rows = [
+                    {
+                        "name": "Wireless Mouse",
+                        "sku": "ELE-1001",
+                        "category_id": category_lookup["electronics"],
+                        "price": 24.99,
+                        "stock_quantity": 12,
+                        "status": "in_stock",
+                        "created_at": datetime.now(timezone.utc),
+                    },
+                    {
+                        "name": "USB-C Hub",
+                        "sku": "ELE-1002",
+                        "category_id": category_lookup["electronics"],
+                        "price": 49.5,
+                        "stock_quantity": 7,
+                        "status": "low_stock",
+                        "created_at": datetime.now(timezone.utc),
+                    },
+                    {
+                        "name": "Ergonomic Keyboard",
+                        "sku": "OFF-2001",
+                        "category_id": category_lookup["office-supplies"],
+                        "price": 68.0,
+                        "stock_quantity": 18,
+                        "status": "in_stock",
+                        "created_at": datetime.now(timezone.utc),
+                    },
+                    {
+                        "name": "Office Chair",
+                        "sku": "FUR-3001",
+                        "category_id": category_lookup["furniture"],
+                        "price": 139.99,
+                        "stock_quantity": 3,
+                        "status": "critical",
+                        "created_at": datetime.now(timezone.utc),
+                    },
+                ]
+                connection.execute(insert(products), product_rows)
 
     def message_payload(data):
         values = {
@@ -56,11 +162,62 @@ def create_app():
 
     @app.get("/")
     def home():
-        return render_template("index.html")
+        try:
+            initialise_database()
+            with database_engine.connect() as connection:
+                total_products = connection.execute(select(func.count()).select_from(products)).scalar_one()
+                low_stock = connection.execute(
+                    select(func.count()).select_from(products).where(products.c.stock_quantity <= 10)
+                ).scalar_one()
+                categories_count = connection.execute(select(func.count()).select_from(categories)).scalar_one()
+        except SQLAlchemyError:
+            total_products = 0
+            low_stock = 0
+            categories_count = 0
+        return render_template(
+            "index.html",
+            total_products=total_products,
+            low_stock=low_stock,
+            categories_count=categories_count,
+        )
 
     @app.get("/about")
     def about():
         return render_template("about.html")
+
+    @app.get("/categories")
+    def categories():
+        try:
+            initialise_database()
+            with database_engine.connect() as connection:
+                rows = connection.execute(
+                    select(categories).order_by(categories.c.name.asc())
+                ).mappings().all()
+        except SQLAlchemyError:
+            rows = []
+        return render_template("categories.html", categories=rows)
+
+    @app.get("/inventory")
+    def inventory():
+        try:
+            initialise_database()
+            with database_engine.connect() as connection:
+                rows = connection.execute(
+                    select(
+                        products.c.id,
+                        products.c.name,
+                        products.c.sku,
+                        products.c.price,
+                        products.c.stock_quantity,
+                        products.c.status,
+                        categories.c.name.label("category_name"),
+                    )
+                    .select_from(products.join(categories, products.c.category_id == categories.c.id))
+                    .order_by(products.c.name.asc())
+                ).mappings().all()
+        except SQLAlchemyError:
+            rows = []
+        return render_template("inventory.html", products=rows)
 
     @app.route("/contact", methods=["GET", "POST"])
     def contact():
@@ -130,9 +287,9 @@ def create_app():
             with database_engine.connect() as connection:
                 connection.execute(text("SELECT 1"))
         except SQLAlchemyError:
-            return jsonify(status="unavailable", database="mysql"), 503
+            return jsonify(status="unavailable", database="sqlite"), 503
 
-        return jsonify(status="ok", database="mysql")
+        return jsonify(status="ok", database="sqlite")
 
     @app.get("/health")
     def health():

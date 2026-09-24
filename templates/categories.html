@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Categories | Flask Inventory{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <p class="eyebrow">Product groups</p>
+  <h1>Categories</h1>
+  <p class="intro">Organize inventory by product family and manage restocking from a single view.</p>
+</section>
+
+<section class="catalog-grid">
+  {% for category in categories %}
+    <article class="catalog-card">
+      <span class="pill">{{ category.name }}</span>
+      <h2>{{ category.name }}</h2>
+      <p>{{ category.description or 'Inventory category for product planning.' }}</p>
+      <a class="button primary" href="{{ url_for('inventory') }}">View products</a>
+    </article>
+  {% else %}
+    <article class="catalog-card empty-state">
+      <h2>No categories available</h2>
+      <p>Inventory categories will appear once the database is seeded.</p>
+    </article>
+  {% endfor %}
+</section>
+{% endblock %}
