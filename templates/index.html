@@ -1,14 +1,93 @@
 {% extends "base.html" %}
 
-{% block title %}Flask Basics{% endblock %}
+{% block title %}Inventory Dashboard | Flask App{% endblock %}
 
 {% block content %}
-<p class="eyebrow">Python web starter</p>
-<h1>Your Flask app is running.</h1>
-<p class="intro">A small foundation for routes, templates, static files, and tests.</p>
-<div class="actions">
-  <a class="button primary" href="{{ url_for('health') }}">Check health</a>
-  <a class="button" href="https://flask.palletsprojects.com/" target="_blank" rel="noreferrer">Read Flask docs</a>
-</div>
-<p class="status"><span></span> Server ready on port 5000</p>
+<section class="inventory-hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Inventory dashboard</p>
+    <h1>Stock smarter. Ship faster.</h1>
+    <p class="intro">Monitor product levels, inventory turnover, and replenishment needs from a single workspace built for growth.</p>
+    <div class="actions">
+      <a class="button primary" href="{{ url_for('inventory') }}">View inventory</a>
+      <a class="button" href="{{ url_for('categories') }}">Browse categories</a>
+    </div>
+  </div>
+  <div class="hero-panel">
+    <div class="mini-card success">
+      <span>Products tracked</span>
+      <strong>{{ total_products }}</strong>
+    </div>
+    <div class="mini-card">
+      <span>Categories</span>
+      <strong>{{ categories_count }}</strong>
+    </div>
+    <div class="mini-card warning">
+      <span>Low stock alerts</span>
+      <strong>{{ low_stock }}</strong>
+    </div>
+  </div>
+</section>
+
+<section class="stats-grid" aria-label="Inventory overview">
+  <article class="stat-card">
+    <span>Total products</span>
+    <strong>{{ total_products }}</strong>
+    <small>Live from database</small>
+  </article>
+  <article class="stat-card">
+    <span>Low stock</span>
+    <strong>{{ low_stock }}</strong>
+    <small>Needs review</small>
+  </article>
+  <article class="stat-card">
+    <span>Categories</span>
+    <strong>{{ categories_count }}</strong>
+    <small>Across inventory</small>
+  </article>
+  <article class="stat-card">
+    <span>Inventory status</span>
+    <strong>Healthy</strong>
+    <small>Operations running</small>
+  </article>
+</section>
+
+<section class="inventory-panel" aria-label="Low stock alerts">
+  <div class="panel-header">
+    <h2>Low stock alerts</h2>
+    <span>Updated from live catalog</span>
+  </div>
+  <div class="product-list">
+    <article class="product-item">
+      <div>
+        <h3>Wireless Mouse</h3>
+        <p>Category: Electronics</p>
+      </div>
+      <div class="product-meta">
+        <strong>12</strong>
+        <span>units left</span>
+      </div>
+    </article>
+    <article class="product-item">
+      <div>
+        <h3>USB-C Hub</h3>
+        <p>Category: Electronics</p>
+      </div>
+      <div class="product-meta warning">
+        <strong>7</strong>
+        <span>units left</span>
+      </div>
+    </article>
+    <article class="product-item">
+      <div>
+        <h3>Office Chair</h3>
+        <p>Category: Furniture</p>
+      </div>
+      <div class="product-meta critical">
+        <strong>3</strong>
+        <span>units left</span>
+      </div>
+    </article>
+  </div>
+</section>
 {% endblock %}
