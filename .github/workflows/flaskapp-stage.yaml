@@ -15,7 +15,7 @@ on:
 
 jobs:
   release-build:
-    runs-on: python
+    runs-on: stage
 
     steps:
       - uses: actions/checkout@v4
