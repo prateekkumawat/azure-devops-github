@@ -24,6 +24,8 @@ def test_inventory_and_category_pages_load():
     assert categories_response.status_code == 200
     assert b"Wireless Mouse" in inventory_response.data
     assert b"Electronics" in categories_response.data
+    assert b"inventory-search" in inventory_response.data
+    assert b"filter-chip" in inventory_response.data
 
 
 def test_health_endpoint_returns_ok():

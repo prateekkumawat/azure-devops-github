@@ -9,6 +9,22 @@
   <p class="intro">Track stock status, item SKUs, pricing, and product families across the warehouse.</p>
 </section>
 
+<section class="inventory-toolbar" aria-label="Inventory controls">
+  <div class="toolbar-top">
+    <div class="search-box">
+      <label for="inventory-search" class="sr-only">Search inventory</label>
+      <input id="inventory-search" class="inventory-search" type="search" placeholder="Search by product or SKU" aria-label="Search inventory" />
+    </div>
+    <div id="inventory-summary" class="live-summary" aria-live="polite">Showing 0 of 0 products</div>
+  </div>
+  <div class="filter-row" aria-label="Inventory filters">
+    <button class="filter-chip active" data-filter="all" type="button">All</button>
+    <button class="filter-chip" data-filter="in_stock" type="button">In stock</button>
+    <button class="filter-chip" data-filter="low_stock" type="button">Low stock</button>
+    <button class="filter-chip" data-filter="critical" type="button">Critical</button>
+  </div>
+</section>
+
 <section class="product-table-wrap">
   <table class="product-table">
     <thead>
@@ -23,7 +39,7 @@
     </thead>
     <tbody>
       {% for product in products %}
-      <tr>
+      <tr class="product-row" data-status="{{ product.status }}" data-search="{{ product.name|lower }} {{ product.sku|lower }} {{ product.category_name|lower }}">
         <td>{{ product.name }}</td>
         <td>{{ product.sku }}</td>
         <td>{{ product.category_name }}</td>
@@ -41,4 +57,53 @@
     </tbody>
   </table>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('inventory-search');
+    const rows = Array.from(document.querySelectorAll('.product-row'));
+    const filterButtons = Array.from(document.querySelectorAll('.filter-chip'));
+    const summary = document.getElementById('inventory-summary');
+    let activeFilter = 'all';
+
+    const updateSummary = (visibleCount) => {
+      if (!summary) {
+        return;
+      }
+      summary.textContent = `Showing ${visibleCount} of ${rows.length} products`;
+    };
+
+    const applyFilters = () => {
+      const query = (searchInput ? searchInput.value.trim().toLowerCase() : '');
+      let visibleCount = 0;
+
+      rows.forEach((row) => {
+        const matchesQuery = !query || (row.dataset.search || '').includes(query);
+        const matchesStatus = activeFilter === 'all' || row.dataset.status === activeFilter;
+        const isVisible = matchesQuery && matchesStatus;
+        row.hidden = !isVisible;
+
+        if (isVisible) {
+          visibleCount += 1;
+        }
+      });
+
+      updateSummary(visibleCount);
+    };
+
+    if (searchInput) {
+      searchInput.addEventListener('input', applyFilters);
+    }
+
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', function () {
+        activeFilter = button.dataset.filter || 'all';
+        filterButtons.forEach((chip) => chip.classList.toggle('active', chip === button));
+        applyFilters();
+      });
+    });
+
+    applyFilters();
+  });
+</script>
 {% endblock %}
