@@ -7,12 +7,8 @@
 # documentation.
 
 name: Release Code on Flask app stage
-
 on:
-  push:
-    branches:
-      - stage
-
+  workflow_dispatch:
 jobs:
   release-build:
     runs-on: stage
