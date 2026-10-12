@@ -1,32 +1,51 @@
-name: Build and Upload python flask Artifects
+name: Build and Upload Python Flask Artifacts
 
-on: 
+on:
   push:
     branches:
       - stage
 
-jobs: 
-   deploy: 
-     runs-on: stage
+jobs:
+  deploy:
+    runs-on: stage
 
-     steps: 
-     - name: AppCode Checkout
-       uses: actions/checkout@v4
-  
-     - name: Install Build and Upload Dependcies
-       run: | 
-         python -m pip install build twine 
+    steps:
+      - name: Checkout Application Code
+        uses: actions/checkout@v4
 
-     - name: Build source 
-       run: python -m build 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-     - name: Upload Nexus Repo 
-       uses: sonatype-nexus-community/nexus-repo-github-action@master
-       env: 
-        NEXUS_TOKEN: ${{ secrets.NEXUS_TOKEN }}
-        NEXUS_HOST_URL: ${{ secrets.NEXUS_HOST_URL }}
-        NEXUS_USER: ${{ secrets.NEXUS_USER }}
-       with: 
-         nexus_repository: 'flask-app' 
-         upload_directoey: 'dist'
-     
+      - name: Install Build Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+
+      - name: Build Flask Package
+        run: |
+          python -m build
+          ls -lh dist/
+
+      - name: Upload Artifacts to Nexus Raw
+        env:
+          NEXUS_HOST_URL: ${{ secrets.NEXUS_HOST_URL }}
+          NEXUS_USER: ${{ secrets.NEXUS_USER }}
+          NEXUS_TOKEN: ${{ secrets.NEXUS_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          for file in dist/*; do
+            [ -f "$file" ] || continue
+            filename=$(basename "$file")
+
+            echo "Uploading: $filename"
+
+            curl --fail --show-error --silent \
+              --user "${NEXUS_USER}:${NEXUS_TOKEN}" \
+              --upload-file "$file" \
+              "${NEXUS_HOST_URL%/}/repository/flask-app/${GITHUB_SHA}/${filename}"
+          done
+
+          echo "All artifacts uploaded successfully."
