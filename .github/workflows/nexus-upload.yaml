@@ -19,12 +19,12 @@ jobs:
        run: python -m build 
 
      - name: Upload Nexus Repo 
+       uses: lfit/nexus-upload-action@v1
        env: 
         NEXUS_TOKEN: ${{ secrets.NEXUS_TOKEN }}
         NEXUS_HOST_URL: ${{ secrets.NEXUS_HOST_URL }}
         NEXUS_USER: ${{ secrets.NEXUS_USER }}
        with: 
          nexus_repository: 'flask-app' 
-       run: | 
-         twine upload dist/* 
+         upload_directoey: 'dist'
      
