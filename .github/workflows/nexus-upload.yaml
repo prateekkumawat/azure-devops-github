@@ -1,0 +1,30 @@
+name: Build and Upload python flask Artifects
+
+on: 
+  workflow_dispatch:
+
+jobs: 
+   deploy: 
+     runs-on: stage
+
+     steps: 
+     - name: AppCode Checkout
+       uses: actions/checkout@v4
+  
+     - name: Install Build and Upload Dependcies
+       run: | 
+         python -m pip install build twine 
+
+     - name: Build source 
+       run: python -m build 
+
+     - name: Upload Nexus Repo 
+       env: 
+        NEXUS_TOKEN: ${{ secrets.NEXUS_TOKEN }}
+        NEXUS_HOST_URL: ${{ secrets.NEXUS_HOST_URL }}
+        NEXUS_USER: ${{ secrets.NEXUS_USER }}
+       with: 
+         nexus_repository: 'flask-app' 
+       run: | 
+         twine upload dist/* 
+     
