@@ -1,7 +1,9 @@
 name: Build and Upload python flask Artifects
 
 on: 
-  workflow_dispatch:
+  push:
+    branches:
+      - stage
 
 jobs: 
    deploy: 
