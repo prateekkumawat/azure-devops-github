@@ -21,7 +21,7 @@ jobs:
        run: python -m build 
 
      - name: Upload Nexus Repo 
-       uses: lfit/nexus-upload-action@v1
+       uses: sonatype-nexus-community/nexus-repo-github-action@master
        env: 
         NEXUS_TOKEN: ${{ secrets.NEXUS_TOKEN }}
         NEXUS_HOST_URL: ${{ secrets.NEXUS_HOST_URL }}
