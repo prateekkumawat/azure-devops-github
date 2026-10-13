@@ -1,0 +1,41 @@
+trigger: 
+  - main 
+
+pool: 
+  name: azure-vm-pool
+
+steps:
+- checkout: self
+  displayName: 'Appcode Checkout' 
+
+- script: | 
+    python -m pip install --upgrade pip
+    pip install -r requirement.txt
+    python -m pip install build
+  displayName: 'Install application dependecies'
+
+- script: |
+    echo "start python app build"    
+    python -m build
+  displayName: 'python App Build'
+
+- task: SonarQubePrepare@7
+  inputs:
+    SonarQube: 'sonar-azure-connection' # This assumes you've set up a service connection named 'SonarQube'
+    scannerMode: 'CLI'
+    configMode: 'manual'
+    cliProjectKey: 'azure-devops-github'
+    cliProjectName: 'azure-devops-github'
+
+- task: SonarQubePublish@7
+  inputs:
+    pollingTimeoutSec: '300'
+  displayName: 'Publish SonarQube Analysis Results Quality Gate'
+
+- task: publishPipelineArtifacts@1
+  inputs: 
+     targetPath: '$(Build.SourceDirectory)'
+     artifacts: 'python-app'
+     publishLocation: 'pipeline'
+  displayName: 'Artifacts manage'
+
