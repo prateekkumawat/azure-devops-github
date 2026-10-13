@@ -30,6 +30,14 @@ Use <http://127.0.0.1:5000/db-health> to check the connection. It returns `200` 
 pytest
 ```
 
+## Build distributions
+
+```powershell
+python setup.py sdist bdist_wheel
+```
+
+The source distribution and wheel are written to `dist/`.
+
 ## Configuration
 
 The app accepts `FLASK_HOST`, `FLASK_PORT`, `FLASK_DEBUG`, `SECRET_KEY`, and `DATABASE_URL` environment variables.
