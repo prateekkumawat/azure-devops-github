@@ -9,10 +9,10 @@ steps:
   displayName: 'Appcode Checkout' 
 
 - script: | 
-    pip install --upgrade pip
-    pip install -r requirement.txt
-    pip install twine keyring artifacts-keyring
-    pip install build
+    pip install --upgrade pip --break-system-packages
+    pip install -r requirement.txt --break-system-packages
+    pip install twine keyring artifacts-keyring --break-system-packages
+    pip install build --break-system-packages
   displayName: 'Install application dependecies'
 
 - script: |
