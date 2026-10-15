@@ -28,6 +28,10 @@ steps:
     cliProjectKey: 'azure-devops-github'
     cliProjectName: 'azure-devops-github'
 
+- task: SonarQubeAnalyze@7
+  displayName: 'Run SonarQube Analysis'
+
+
 - task: SonarQubePublish@7
   inputs:
     pollingTimeoutSec: '300'
