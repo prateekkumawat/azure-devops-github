@@ -28,9 +28,6 @@ steps:
     cliProjectKey: 'azure-devops-github'
     cliProjectName: 'azure-devops-github'
 
-- task: SonarQubeAnalyze@7
-  displayName: 'Run SonarQube Analysis'
-
 
 # Place immediately after SonarQubePrepare@7
 - bash: |
@@ -54,6 +51,10 @@ steps:
     print("##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]" + value)
     PY
   displayName: 'Remove unsupported SonarQube branch property'
+  
+- task: SonarQubeAnalyze@7
+  displayName: 'Run SonarQube Analysis'
+
  
 - task: SonarQubePublish@7
   inputs:
