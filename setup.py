@@ -26,7 +26,7 @@ class build_py(build_py_command):
 
 setup(
     name="flask-contact-api",
-    version="1.0.1",
+    version="1.1.0",
     description="A Flask contact and inventory application",
     long_description=(ROOT / "README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
