@@ -26,10 +26,11 @@ Parameters:
 trigger: none
 
 pool: 
-  name:  ${{ parameters.azure-agent-pool }}
+  name: ${{ parameters.azure-agent-pool }}
 
 steps:
-- checkout: ${{ parameters.GitBranch }}
+- checkout: self 
+  ref: ${{ parameters.GitBranch }}
   displayName: 'Appcode Checkout' 
 
 - script: | 
