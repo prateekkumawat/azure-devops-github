@@ -1,5 +1,5 @@
 parameters:
-- name: azureAagentpool
+- name: azureAgentpool
   displayName: azure-agent-pool
   type: string
   default: azure-vm-pool
