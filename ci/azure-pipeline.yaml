@@ -8,11 +8,6 @@ parameters:
   - azure-prod-vm-pool
   - default-pool
 
-- name: GitBranch
-  displayName: "Git Branch"
-  type: string
-  default: main
-
 - name: SonarAnalysis
   displayName: Run SonarQube Analysis
   type: boolean
@@ -30,7 +25,6 @@ pool:
 
 steps:
 - checkout: self 
-  ref: ${{ parameters.GitBranch }}
   displayName: 'Appcode Checkout' 
 
 - script: | 
