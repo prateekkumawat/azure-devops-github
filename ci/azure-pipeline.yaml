@@ -1,5 +1,5 @@
-Parameters:
-- name: azure-agent-pool
+parameters:
+- name: azureAagentpool
   displayName: azure-agent-pool
   type: string
   default: azure-vm-pool
@@ -26,7 +26,7 @@ Parameters:
 trigger: none
 
 pool: 
-  name: ${{ parameters.azure-agent-pool }}
+  name: ${{ parameters.azureAgentpool }}
 
 steps:
 - checkout: self 
