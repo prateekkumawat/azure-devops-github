@@ -20,8 +20,12 @@ parameters:
 
 trigger: none
 
+variables:
+- name: agentPoolName
+  value: ${{ parameters.azureAgentpool }}
+
 pool: 
-  name: ${{ parameters.azureAgentpool }}
+  name: $(agentPoolName)
 
 steps:
 - checkout: self 
