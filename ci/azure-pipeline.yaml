@@ -121,8 +121,8 @@ steps:
 - script:  |
     echo "Build container Images"
     az acr login -n $(acrLoginName) -u "$(ACR_USERNAME)" -p "$(ACR_PASSWORD)"
-    docker build -t $(acrLoginServer)/apps:$(imageTag) .
-    docker push $(acrLoginServer)/apps:$(imageTag)
+    docker build -t $(acrLoginServer)/apps:${{ parameters.imageTag }} .
+    docker push $(acrLoginServer)/apps:${{ parameters.imageTag }}
 
     echo "Image Push in acr repo"   
   displayName: ContainerImageBuild
