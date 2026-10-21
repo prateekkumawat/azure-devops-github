@@ -11,7 +11,7 @@ parameters:
 - name: imageTag
   displayName: Docker Image Build 
   type: string
-  default: pyapp:v2.1.0
+  default: v2.1.0
 
 - name: SonarAnalysis
   displayName: Run SonarQube Analysis
