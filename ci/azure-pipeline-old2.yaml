@@ -1,0 +1,104 @@
+parameters:
+- name: azureAgentpool
+  displayName: azure-agent-pool
+  type: string
+  default: azure-vm-pool
+  values:
+  - azure-vm-pool
+  - azure-prod-vm-pool
+  - default-pool
+
+- name: SonarAnalysis
+  displayName: Run SonarQube Analysis
+  type: boolean
+  default: true
+
+- name: ArtifactsUpload
+  displayName: Run Artifacts Building
+  type: boolean
+  default: false
+
+trigger: none
+
+variables:
+- name: agentPoolName
+  value: ${{ parameters.azureAgentpool }}
+
+pool: 
+  name: $(agentPoolName)
+
+steps:
+- checkout: self 
+  displayName: 'Appcode Checkout' 
+
+- script: | 
+    pip install --upgrade pip --break-system-packages
+    pip install -r requirement.txt --break-system-packages
+    pip install twine keyring artifacts-keyring --break-system-packages
+    pip install build --break-system-packages
+  displayName: 'Install application dependecies'
+
+- script: |
+    echo "start python app build"    
+    python3 setup.py sdist bdist_wheel
+  displayName: 'python App Build'
+
+- ${{ if eq(parameters.SonarAnalysis, true) }}:
+  - task: SonarQubePrepare@7
+    inputs:
+      SonarQube: 'sonar-azure-connection' # This assumes you've set up a service connection named 'SonarQube'
+      scannerMode: 'CLI'
+      configMode: 'manual'
+      cliProjectKey: 'azure-devops-github'
+      cliProjectName: 'azure-devops-github'
+
+
+  # Place immediately after SonarQubePrepare@7
+  - bash: |
+      python3 - <<'PY'
+      import json
+      import os
+
+      raw = os.environ.get("SONARQUBE_SCANNER_PARAMS", "{}")
+      params = json.loads(raw)
+
+      removed = params.pop("sonar.branch.name", None)
+      print("Removed automatically injected branch property:", removed is not None)
+
+      value = json.dumps(params, separators=(",", ":"))
+      value = (value.replace("%", "%AZP25")
+                    .replace("\r", "%0D")
+                    .replace("\n", "%0A")
+                    .replace("]", "%5D")
+                    .replace(";", "%3B"))
+
+      print("##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]" + value)
+      PY
+    displayName: 'Remove unsupported SonarQube branch property'
+    
+  - task: SonarQubeAnalyze@7
+    displayName: 'Run SonarQube Analysis'
+
+  
+  - task: SonarQubePublish@7
+    inputs:
+      pollingTimeoutSec: '300'
+    displayName: 'Publish SonarQube Analysis Results Quality Gate'
+
+- ${{ if eq(parameters.SonarAnalysis, false) }}:
+  - script: echo "SonarQube Analysis skipped Due to Boolen is false"
+    displayName: Skip SonarQubeAnalys
+
+- ${{ if eq(parameters.ArtifactsUpload, true) }}:
+  - task: TwineAuthenticate@1
+    inputs:
+      artifactFeed: prateekkumawat20/pyflask                ## For an organization-scoped feed, use: artifactFeed: <FEED_NAME>
+    displayName: 'Twine Authenticate'
+
+  - script: |
+      python3 -m twine upload -r pyflask --config-file $(PYPIRC_PATH) dist/*.whl
+    displayName: 'Upload to feed'
+
+- ${{ if eq(parameters.ArtifactsUpload, false) }}:
+  - script: echo "ArtifiactsUpload skipped Due to Boolen is false, No feed availabel for this Builds "
+    displayName: Skip Artifacts Upload
