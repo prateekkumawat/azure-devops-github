@@ -28,11 +28,16 @@ trigger: none
 variables:
 - name: agentPoolName
   value: ${{ parameters.azureAgentpool }}
-  imageRepo: 'apps'
-  dockerRegistryServiceConnection: 'ecrapp-sc'
-  acrLoginServer: 'ecrapp.azurecr.io'
-  acrLoginName: 'ecrapp'
-  resourceGroup: 'app-env-setup'
+- name:  imageRepo
+  value: 'apps'
+- name:  dockerRegistryServiceConnection
+  value: 'ecrapp-sc'
+- name:  acrLoginServer
+  value: 'ecrapp.azurecr.io'
+- name:  acrLoginName
+  value: 'ecrapp'
+- name:  resourceGroup
+  value: 'app-env-setup'
 
 pool: 
   name: $(agentPoolName)
