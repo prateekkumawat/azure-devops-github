@@ -14,7 +14,7 @@ stringData:
   .dockerconfigjson: |
     {
       "auths": {
-        "ecrapp.azurecr.io": {
+        "https://ecrapp.azurecr.io": {
           "username": "ecrapp",
           "password": "8C349WWIEdhLkMsAvTipMoYwyUq0RZq20smTLWI1ujgyuBjYdWR8JQQJ99CJACGhslBEqg7NAAACAZCRPvIY"
         }
