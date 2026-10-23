@@ -36,11 +36,11 @@ spec:
       labels:
         app: myapp
     spec:
+      imagePullSecrets:
+        - name:  acr-secret
       containers:
       - name: myapp
         image: ecrapp.azurecr.io/apps:v2.1.1
-        imagePullSecrets:
-          - name:  acr-secret
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
