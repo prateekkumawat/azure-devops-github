@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flaskapp
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: acr-secret
+  namespace: flaskapp
+type: kubernetes.io/dockerconfigjson
+stringData:
+  .dockerconfigjson: |
+    {
+      "auths": {
+        "ecrapp.azurecr.io": {
+          "username": "ecrapp",
+          "password": "8C349WWIEdhLkMsAvTipMoYwyUq0RZq20smTLWI1ujgyuBjYdWR8JQQJ99CJACGhslBEqg7NAAACAZCRPvIY"
+        }
+      }
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: flaskapp
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: ecrapp.azurecr.io/apps:v2.1.1
+        imagePullSecrets:
+          - name:  acr-secret
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-svc
+  namespace: flaskapp
+spec:
+  selector:
+    app: myapp
+  ports:
+  - port: 8000
+    targetPort: 8000
+
