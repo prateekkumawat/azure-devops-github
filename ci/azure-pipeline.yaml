@@ -118,7 +118,7 @@ steps:
       mavenPomFile: 'pom.xml'
       mavenOptions: '-Xmx3072m'
       javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '1.21'
+      jdkVersionOption: 'default'
       jdkArchitectureOption: 'x64'
       publishJUnitResults: false
       mavenVersionOption: 'Default'
