@@ -11,7 +11,7 @@ parameters:
 - name: imageTag
   displayName: Docker Image Build 
   type: string
-  default: v2.1.0
+  default: v1.0.0
 
 - name: SonarAnalysis
   displayName: Run SonarQube Analysis
@@ -46,17 +46,18 @@ steps:
 - checkout: self 
   displayName: 'Appcode Checkout' 
 
-- script: | 
-    pip install --upgrade pip --break-system-packages
-    pip install -r requirement.txt --break-system-packages
-    pip install twine keyring artifacts-keyring --break-system-packages
-    pip install build --break-system-packages
-  displayName: 'Install application dependecies'
 
-- script: |
-    echo "start python app build"    
-    python3 setup.py sdist bdist_wheel
-  displayName: 'python App Build'
+- task: Maven@4
+  inputs:
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: 'default'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: true
+    testResultsFiles: '**/TEST-*.xml'
+    goals: 'package'
+  displayName: 'Maven Builds'   
 
 - ${{ if eq(parameters.SonarAnalysis, true) }}:
   - task: SonarQubePrepare@7
@@ -64,8 +65,8 @@ steps:
       SonarQube: 'sonar-azure-connection' # This assumes you've set up a service connection named 'SonarQube'
       scannerMode: 'CLI'
       configMode: 'manual'
-      cliProjectKey: 'azure-devops-github'
-      cliProjectName: 'azure-devops-github'
+      cliProjectKey: 'azure-devops-javaapp'
+      cliProjectName: 'azure-devops-javaapp'
 
 
   # Place immediately after SonarQubePrepare@7

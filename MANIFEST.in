@@ -1,5 +1,0 @@
-include README.md
-include requirements.txt
-include app.py
-recursive-include static *
-recursive-include templates *

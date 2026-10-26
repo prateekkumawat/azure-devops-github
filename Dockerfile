@@ -1,21 +1,36 @@
-FROM python:3.12-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
+# Build Stage
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt \
-    && addgroup --system app \
-    && adduser --system --ingroup app app
+# Copy pom.xml and download dependencies (cached layer)
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
 
-COPY --chown=app:app app.py ./
-COPY --chown=app:app static/ ./static/
-COPY --chown=app:app templates/ ./templates/
+# Copy source code and build package
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-USER app
+# Runtime Stage
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
 
-EXPOSE 8000
+# Create non-root user for security
+#RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+#USER appuser
 
-CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:8000", "app:app"]
+# Copy jar artifact from build stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose port
+EXPOSE 8080
+
+# Environment variables
+ENV PORT=8080 \
+    SPRING_PROFILES_ACTIVE=prod
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost:8080/api/v1/health || exit 1
+
+# Entrypoint
+ENTRYPOINT ["java", "-jar", "app.jar"]
