@@ -11,7 +11,7 @@ parameters:
 - name: imageTag
   displayName: Docker Image Build 
   type: string
-  default: v1.0.0
+  default: v3.0.0
 
 - name: SonarAnalysis
   displayName: Run SonarQube Analysis
@@ -21,7 +21,7 @@ parameters:
 - name: ArtifactsUpload
   displayName: Run Artifacts Building
   type: boolean
-  default: false
+  default: true
 
 trigger: none
 
@@ -105,15 +105,25 @@ steps:
   - script: echo "SonarQube Analysis skipped Due to Boolen is false"
     displayName: Skip SonarQubeAnalys
 
+# Maven artifact upload to Azure Artifacts
 - ${{ if eq(parameters.ArtifactsUpload, true) }}:
-  - task: TwineAuthenticate@1
+  - task: MavenAuthenticate@0
+    displayName: 'Maven Feed Authentication'
     inputs:
-      artifactFeed: prateekkumawat20/pyflask                ## For an organization-scoped feed, use: artifactFeed: <FEED_NAME>
-    displayName: 'Twine Authenticate'
+      artifactsFeeds: 'prateekkumawat20/pyflask'
 
-  - script: |
-      python3 -m twine upload -r pyflask --config-file $(PYPIRC_PATH) dist/*.whl
-    displayName: 'Upload to feed'
+  - task: Maven@4
+    displayName: 'Upload Maven Artifact to Azure Artifacts'
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.21'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: false
+      mavenVersionOption: 'Default'
+      goals: 'deploy'
+      options: '-DskipTests'
 
 - ${{ if eq(parameters.ArtifactsUpload, false) }}:
   - script: echo "ArtifiactsUpload skipped Due to Boolen is false, No feed availabel for this Builds "

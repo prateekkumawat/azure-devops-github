@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>api-architecture-backend</artifactId>
-	<version>1.0.0</version>
+	<version>3.0.0</version>
 	<name>api-architecture-backend</name>
 	<description>Full Stack Spring Boot REST API Architecture with CORS, Swagger UI, PostgreSQL, and React</description>
 	<properties>
@@ -65,6 +65,21 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+    
+
+	
+	<distributionManagement>
+		<repository>
+			<id>pyflask</id>
+			<url>https://pkgs.dev.azure.com/prateekkumawat20/prateekkumawat20/_packaging/pyflask/maven/v1</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</distributionManagement>
 
 	<build>
 		<plugins>
